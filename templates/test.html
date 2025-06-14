@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fluffy Rolling Clouds</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(#87CEFA, #ffffff); /* Blue sky gradient */
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="webgl"></canvas>
+<script type="module">
+import * as THREE from 'https://cdn.skypack.dev/three';
+
+const canvas = document.querySelector('#webgl');
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
+camera.position.z = 5;
+
+// Particle geometry
+const particleCount = 4000;
+const positions = new Float32Array(particleCount * 3);
+
+for (let i = 0; i < particleCount; i++) {
+  positions[i * 3 + 0] = (Math.random() - 0.5) * 10; // x
+  positions[i * 3 + 1] = (Math.random() - 0.5) * 5;  // y
+  positions[i * 3 + 2] = (Math.random() - 0.5) * 2;  // z
+}
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+// Shaders
+const vertexShader = `
+uniform float uTime;
+varying float vAlpha;
+
+void main() {
+  vec3 pos = position;
+  pos.x += uTime * 0.2;
+
+  vAlpha = smoothstep(-2.0, 1.5, pos.y);
+
+  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+  gl_PointSize = 60.0 / -mvPosition.z;
+}
+`;
+
+const fragmentShader = `
+precision mediump float;
+varying float vAlpha;
+
+void main() {
+  float dist = length(gl_PointCoord - vec2(0.5));
+  float alpha = smoothstep(0.5, 0.2, dist) * vAlpha;
+
+  gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
+}
+`;
+
+const uniforms = {
+  uTime: { value: 0.0 },
+};
+
+const material = new THREE.ShaderMaterial({
+  uniforms,
+  vertexShader,
+  fragmentShader,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending
+});
+
+const particles = new THREE.Points(geometry, material);
+scene.add(particles);
+
+// Resize handler
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Animation loop
+const clock = new THREE.Clock();
+function animate() {
+  uniforms.uTime.value = clock.getElapsedTime();
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
+ 

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="page-container calculator">
+  <h2>The Calculator</h2>
+  <p>This page will be a full tool where the equations can be dragged and dropped, with tabulation, exports and visual tools for interesting analyses.</p>
+    <p>[Current goal: output answers and compile dictionary of inputs\outputs]</p>
+    <div id="content">
+        <textarea id="math-input" placeholder="Type your math expression here..." rows="4" cols="50"></textarea>
+
+        <div id="math-display"></div> <!-- Placeholder for KaTeX rendering -->
+
+        <div id="threejs-container"></div> <!-- Placeholder for Three.js canvas -->
+    </div>
+  </div>
+    
+    <!-- Your custom JavaScript -->
+    <script type="module" src="{{ url_for('static', filename='js/calculator/calculator.js') }}"></script>
+{% endblock %}

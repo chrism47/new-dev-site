@@ -1,0 +1,24 @@
+{% extends "base_index.html" %}
+{% block content %}
+    <div class="page-container">
+        <p>Welcome to my site. Here's some stuff I've been working on:</p>
+        <div class="animated-selection">
+            <h1>[insert selected art]</h1>
+        </div>
+        <!-- <a href="/calculator">Calculator (put all calculator prototype functionality here)</a>
+        <br> -->
+        <br>
+        <a href="/work">Work</a>
+        <br>
+        <a href="/notebooks">Notebooks</a>
+        <br>
+        <a href="/info">More Information</a>
+
+    
+    </div>
+
+    <script type="module" src="{{ url_for('static', filename='js/background.js') }}"></script>
+
+    <!-- Your custom JavaScript -->
+    <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}

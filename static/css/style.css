@@ -1,0 +1,126 @@
+body {
+    margin: 20px;
+    color: greenyellow;
+    background-color: black;
+    font-family: "Inconsolata", monospace;
+    padding-bottom: 200px;
+}
+
+a {
+    color: greenyellow;
+    text-decoration: none;
+    
+}
+
+.page-container a {
+    display: inline-block; /* or block */
+    padding: 10px;
+    margin: 10px;
+    
+}
+
+.page-container a:hover {
+    border-style: solid;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: greenyellow;
+}
+
+.page-container {
+    font-family: "Inconsolata", monospace;
+    
+}
+
+textarea::placeholder {
+    color: rgba(113, 255, 47, 0.253);
+    opacity: 5 /* Ensure it's fully visible */
+}
+#math-display {
+    margin-top: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+#math-input {
+    margin-top: 20px;
+    background-color: black;
+    color: greenyellow;
+    /* border: none; */
+    border-color: greenyellow;
+    height: 100px;
+    width: 100%;
+    border-radius: 5px;
+}
+
+#threejs-container {
+    width: 100%;
+    height: 400px;
+    margin-top: 20px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000;
+    color: greenyellow;
+    text-align: center;
+    padding: 10px;
+    font-size: 10px;
+}
+.page-container {
+    width: 90%;
+    margin: 10px;
+}
+.background-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.page-container div.animated-selection {
+    margin-top: 20px;
+    background-color: black;
+    color: greenyellow;
+    border-color: greenyellow;
+    height: 200px;
+    width: 100%;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px 0px 1px 0px;
+    
+}
+.page-nav-menu {
+    background-color: #81CB32;
+    opacity: 50%;
+    position: fixed;
+    top: 20px;
+    left: 30%;
+    /* border-style:solid; */
+    display: flex;
+    justify-content: left;
+    border-radius: 12px;
+}
+.page-nav-menu a {
+    color: black;
+    margin: 10px;
+    
+
+}
+.al-g-box, .background-window{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Sends it behind other elements */
+
+}
+.note-display {
+    height: fit-content;
+    width: 100%;
+}
+
+
