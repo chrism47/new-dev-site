@@ -1,26 +1,54 @@
 from flask import Flask, render_template
+from flask_ckeditor import CKEditor, CKEditorField
+from flask_wtf import FlaskForm
+from wtforms import SubmitField, StringField
+from flask_sqlalchemy import SQLAlchemy
+# from dotenv import load_dotenv
 
-from flaskext.markdown import Markdown
-import os
+# load_dotenv()
 
 app = Flask(__name__)
-# Misaka(app, extensions=["tables", "fenced-code"])
-Markdown(app, extensions=["fenced_code", "extra", "codehilite"])
-# MD_DIR = os.path.join(os.path.dirname(__file__), 'md')
+# app.config['SECRET_KEY'] = 'your-secret-key'
+# app.config['CKEDITOR_PKG_TYPE'] = 'standard'  # or 'basic', 'full'
+# app.config['CKEDITOR_ENABLE_CODESNIPPET'] = True
 
-MD_PATH = os.path.join(f'{app.static_folder}', 'md')
+# db = SQLAlchemy()
+# class Post(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     title = db.Column(db.String(80), nullable=False)
+#     subtitle = db.Column(db.String(80), nullable=False)
+#     content = db.Column(db.String(80), nullable=False)
+
+
+
+# ckeditor = CKEditor(app)
+# class MyForm(FlaskForm):
+#     title = StringField('Title')
+#     subtitle = StringField('Subtitle')
+#     date = StringField('Date')  # Date stored as a string
+#     content = CKEditorField('Content')
+#     submit = SubmitField('Submit')
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/test')
-def test():    
-    return render_template('test.html')
+# @app.route('/editor', methods=['GET', 'POST'])
+# def editor():    
+#     form = MyForm()
+#     if form.validate_on_submit():
+#         form_data= {
+#             "title" : form.title.data,
+#             "subtitle": form.subtitle.data,
+#             "date": form.date.data,
+#             "content" : form.content.data   
+#         }
+#         return render_template('post-verify.html', form_data=form_data)
+#     return render_template('editor.html', form=form)
 
-@app.route('/calculator')
-def calculator():
-    return render_template('calculator/calculator.html')
+# @app.route('/post-verify', methods=['GET', 'POST'])
+# def post_verify():
+#     return render_template('post-verify.html')
 
 @app.route('/work')
 def work():  
@@ -34,42 +62,42 @@ def offers():
 def al_g():  
     return render_template('al-g.html')
 
-@app.route('/notebooks')
-def notebooks():
+# @app.route('/notebooks')
+# def notebooks():
 
-    file_dir = os.listdir(MD_PATH)
+#     file_dir = os.listdir(MD_PATH)
     
-    preview_text = []
-    text_count = len(file_dir)
-    for file in range(len(file_dir)):
+#     preview_text = []
+#     text_count = len(file_dir)
+#     for file in range(len(file_dir)):
         
-        filepath = os.path.join(MD_PATH, file_dir[file])
+#         filepath = os.path.join(MD_PATH, file_dir[file])
         
-        with open(filepath, 'r', encoding='utf-8') as f:
-            lines = f.readlines(200)
-            print(lines)
-            preview_text.append({
-                "title": lines[0],
-                "preview": lines[2:]
-            })
+#         with open(filepath, 'r', encoding='utf-8') as f:
+#             lines = f.readlines(200)
+#             print(lines)
+#             preview_text.append({
+#                 "title": lines[0],
+#                 "preview": lines[2:]
+#             })
     
-    print(len(file_dir))
-    return render_template('notebooks.html', md_files=file_dir, preview_text=preview_text, text_count=text_count)
+#     print(len(file_dir))
+#     return render_template('notebooks.html', md_files=file_dir, preview_text=preview_text, text_count=text_count)
 
-@app.route('/notebooks/<filename>')
-def show_markdown(filename):
-    if not filename.endswith('.md'):
-        filename += '.md'
+# @app.route('/notebooks/<filename>')
+# def show_markdown(filename):
+#     if not filename.endswith('.md'):
+#         filename += '.md'
 
-    md_path = os.path.join(MD_PATH, filename)
+#     md_path = os.path.join(MD_PATH, filename)
 
-    if not os.path.exists(md_path):
-        LookupError(404)
+#     if not os.path.exists(md_path):
+#         LookupError(404)
 
-    with open(md_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+#     with open(md_path, 'r', encoding='utf-8') as f:
+#         content = f.read()
     
-    return render_template("note.html", content=content, filename=filename)
+#     return render_template("note.html", content=content, filename=filename)
 
 
 @app.route('/info')

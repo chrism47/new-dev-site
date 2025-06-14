@@ -1,0 +1,21 @@
+{% extends "base_index.html" %}
+{% block content %}
+    {{ ckeditor.load() }}
+    {{ ckeditor.config(name='content') }}
+    <div class="page-container">
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.title.label }}<br>
+        {{ form.title() }}<br>
+        {{ form.subtitle.label }}<br>
+        {{ form.subtitle() }}<br>
+        {{ form.date.label }}<br>
+        {{ form.date() }}<br>
+        {{ form.content.label }}<br>
+        {{ form.content() }}<br>
+        {{ form.submit() }}
+    </form>
+  </div>
+  <script type="module" src="{{ url_for('static', filename='js/test.js') }}"></script>
+{% endblock %}
