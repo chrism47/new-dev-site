@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spiral Galaxy</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: black; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js';
+
+  const particleCount = 3000;
+  const armCount = 4;
+  const armSpread = 1.5;
+  const maxRadius = 50;
+
+  let scene, camera, renderer, galaxy;
+  const positions = new Float32Array(particleCount * 3);
+  const colors = new Float32Array(particleCount * 3);
+  const angles = new Float32Array(particleCount);
+  const radii = new Float32Array(particleCount);
+  const speeds = new Float32Array(particleCount);
+
+  let clock = new THREE.Clock();
+
+  init();
+  animate();
+
+  function init() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.z = 100;
+    // camera.position.y = 100;
+    // camera.rotation.z = 3;
+    // camera.rotation.y = -50;
+    // camera.rotation.x = -20;
+
+    const geometry = new THREE.BufferGeometry();
+
+    for (let i = 0; i < particleCount; i++) {
+      const arm = i % armCount;
+      const radius = Math.random() * maxRadius;
+      const angle = (arm / armCount) * Math.PI * 2 + radius * 0.3 + (Math.random() - 0.5) * armSpread;
+
+      const x = radius * Math.cos(angle);
+      const y = (Math.random() - 0.5) * 4;
+      const z = radius * Math.sin(angle);
+
+      const idx = i * 3;
+      positions[idx] = x;
+      positions[idx + 1] = y;
+      positions[idx + 2] = z;
+
+      radii[i] = radius;
+      angles[i] = angle;
+      speeds[i] = 0.002 + Math.random() * 0.002;
+
+      // Color based on distance from center
+      const t = radius / maxRadius;
+      colors[idx] = 1.0;
+      colors[idx + 1] = 0.8 * (1 - t);
+      colors[idx + 2] = 1.0 - t;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 1.5,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    galaxy = new THREE.Points(geometry, material);
+    scene.add(galaxy);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    window.addEventListener('resize', onWindowResize);
+  }
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const pos = galaxy.geometry.attributes.position.array;
+    const time = clock.getElapsedTime();
+
+    for (let i = 0; i < particleCount; i++) {
+      const idx = i * 3;
+      angles[i] += speeds[i]; // Spin around center
+
+      const radius = radii[i];
+      pos[idx] = radius * Math.cos(angles[i]);
+      pos[idx + 2] = radius * Math.sin(angles[i]);
+      // Slight vertical oscillation
+      pos[idx + 1] += Math.sin(time + i * 0.01) * 0.01;
+    }
+
+    galaxy.geometry.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+  }
+</script>
+</body>
+</html>

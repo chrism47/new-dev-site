@@ -2,16 +2,18 @@
 {% block content %}
     <div class="page-container">
         <h1>al-g</h1>
-        <p> An artistic CS project</p>
+        <p> An artistic CS project. al-g is a 3D art generator and a DSA visualizer currently
+            in the very early stages of development. 
+        </p>
         <div id="threejs-container" class="al-g-box"></div> <!-- Placeholder for Three.js canvas -->
 
         <form id="scene-controls">
             <label>Wireframe: 
                 <input type="checkbox" id="wireframe"></label>
-            <label>Light Intensity: 
-                <input type="range" id="lightIntensity" min="0" max="2" step="0.1" value="1"></label>
+            <label>L   <input type="range" id="lightIntensity" min="0" max="2" step="0.1" value="1"></label>
 
-            <label>
+       ight Intensity: 
+                  <label>
             Background Color:
                 <input type="color" id="bgColor" value="#000000" />
             </label>

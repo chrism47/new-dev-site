@@ -50,6 +50,10 @@ def index():
 # def post_verify():
 #     return render_template('post-verify.html')
 
+@app.route('/shaders')
+def shaders():  
+    return render_template('book-of-shaders.html')
+
 @app.route('/work')
 def work():  
     return render_template('work.html')
