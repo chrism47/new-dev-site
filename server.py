@@ -27,6 +27,10 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+@app.route('/test')
+def test():
+    return render_template('test.html')
+
 # @app.route('/editor', methods=['GET', 'POST'])
 # def editor():    
 #     form = MyForm()

@@ -3,8 +3,16 @@
     <div class="page-container">
         <p>Welcome to my site. Here's some stuff I've been working on:</p>
         <div class="animated-selection">
-            <h1>[insert selected art]</h1>
-        </div>
+             <div class="carousel" id="carousel">
+                <button class="prev">&#10094;</button>
+                <div id="carousel-cont"class="carousel-images">
+                <a href="/space-invaders"><img src="/static/img/Screenshot 2025-06-17 161306.png" class="carousel-img active" /></a>
+                <!-- <a href="/"><img src="https://picsum.photos/id/1016/800/400" class="carousel-img" /></a>
+                <a href="/"><img src="https://picsum.photos/id/1018/800/400" class="carousel-img" /></a> -->
+                </div>
+                    <button class="next">&#10095;</button>
+                </div>
+                </div>
         <!-- <a href="/calculator">Calculator (put all calculator prototype functionality here)</a>
         <br> -->
         <br>
@@ -18,6 +26,7 @@
     </div>
 
     <script type="module" src="{{ url_for('static', filename='js/homeBackground.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/carousel.js') }}"></script>
 
     <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
