@@ -58,9 +58,9 @@ def shaders():
 def work():  
     return render_template('work.html')
 
-@app.route('/offers')
-def offers():  
-    return render_template('offers.html')
+@app.route('/space-invaders')
+def space_invaders():  
+    return render_template('vibe-codes/space-invaders.html')
 
 @app.route('/al-g')
 def al_g():  

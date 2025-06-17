@@ -1,5 +1,5 @@
 /static/md
-/static/threejs-examples/
+/static/threejs-examples
 /junk
 /.venv
 /.env

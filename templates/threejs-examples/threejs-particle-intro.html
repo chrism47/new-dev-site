@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Three.js Particles Boilerplate</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js';
+
+
+  // Scene, Camera, Renderer
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 50;
+//   camera.position.x = 10
+//   camera.position.y = 1;
+  let keys = {}
+  const renderer = new THREE.WebGLRenderer({ antialias: true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+// //  const cube_geometry = new THREE.BoxGeometry(20, 10, 20); // width, height, depth
+// const plane_geometry = new THREE.PlaneGeometry(200, 200); // width, height, depth
+// const plane_material = new THREE.MeshBasicMaterial({ 
+//     color: 0x00ffff,
+//     transparent: true
+
+//  }); // green
+// const plane = new THREE.Mesh(plane_geometry, plane_material);
+// scene.add(plane);
+
+  // Particle Geometry
+  const particleCount = 1000;
+  //load the geometry
+  
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+  
+//   // Cubic distribution
+//   for (let i = 0; i < particleCount * 3; i++) {
+//     positions[i] = (Math.random() - 0.5) * 5;
+//   }
+// const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // color, intensity
+// scene.add(ambientLight);
+
+  // Spherical distribution
+    for (let i = 0; i < particleCount; i++) {
+        const r = Math.random() * 3.2;
+        const theta = Math.random() * 2 * Math.PI;
+        const phi = Math.acos(2 * Math.random() - 1);
+
+        const x = r * Math.sin(phi) * Math.cos(theta);
+        const y = r * Math.sin(phi) * Math.sin(theta);
+        const z = r * Math.cos(phi);
+
+        positions.set([x, y, z], i * 3);
+}
+
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const texture = new THREE.TextureLoader().load('https://i.imgur.com/QgzbYs8.jpeg');
+  // Material
+  const material = new THREE.PointsMaterial({ 
+    color: 0x00ff00, 
+    size:1,
+    map: texture,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    alphaTest: 0.2, 
+    opacity: 0.2
+});
+
+  // Points (particles)
+  const particles = new THREE.Points(geometry, material);
+  scene.add(particles);
+
+
+// Key press state tracking
+  document.addEventListener('keydown', (event) => keys[event.key.toLowerCase()] = true);
+  document.addEventListener('keyup', (event) => keys[event.key.toLowerCase()] = false);
+
+  let radius = 5;
+  let mult = 1;
+
+
+
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    // camera.rotation.z += .01
+//      for (let i = 0; i < positions.length; i += 3) {
+//     // Example: Simple oscillation using sine
+//         positions[i + 2] = Math.cos(Math.cos(Date.now() * 0.0001 + i))*5 ;
+//         positions[i + 1] = Math.cos(Date.now() * 0.0001 + i) *10;
+//         positions[i - 1] = Math.sin(Date.now() * 0.0001 + i) * 50;
+        
+        
+//   }
+
+//   geometry.attributes.position.needsUpdate = true;
+for (let i = 0; i < positions.length; i += 3) {
+  
+if (keys['w']) radius += 0.01;
+if (keys['s']) radius -= 0.01;
+if (keys['e']) mult += 0.01;
+if (keys['q']) mult -= 0.01;
+if (keys['i']) camera.translateY(-.001);
+if (keys['k']) camera.translateY(.001);
+if (keys['o']) camera.rotation.y += 0.00001;
+if (keys['l']) camera.rotation.y -= 0.00001;
+
+  const angle = Date.now() * 0.0001 + i;
+  positions[i] = radius * ((Math.cos(angle))/mult*(Math.sin(angle)));
+  positions[i + 2] = radius  * Math.sin(angle)/ 10;
+}
+
+  geometry.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Resize handling
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+</script>
+</body>
+</html>

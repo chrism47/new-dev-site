@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Space Shooter - Enhanced Edition</title>
+  <style>
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      background: radial-gradient(circle, #001122, #000000);
+      font-family: 'Courier New', monospace;
+    }
+    canvas { display: block; }
+    #mobileControls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 200;
+  display: none;
+}
+
+.dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dpad > div {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn {
+  width: 100px;
+  height: 100px;
+  margin: 5px;
+  font-size: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #00ffff;
+  color: #00ffff;
+  border-radius: 10px;
+  touch-action: none;
+}
+
+#shootBtn {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 100px;
+  height: 100px;
+  font-size: 30px;
+}
+
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: #00ffff;
+      font-size: 18px;
+      text-shadow: 0 0 10px #00ffff;
+      z-index: 100;
+    }
+    
+    #gameOver {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff0000;
+      font-size: 48px;
+      text-align: center;
+      text-shadow: 0 0 20px #ff0000;
+      display: none;
+      z-index: 200;
+    }
+    
+    #instructions {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      color: #ffffff;
+      font-size: 14px;
+      opacity: 0.8;
+      z-index: 100;
+    }
+    
+    #powerupAlert {
+      position: absolute;
+      top: 50px;
+      right: 10px;
+      color: #ffff00;
+      font-size: 16px;
+      text-shadow: 0 0 10px #ffff00;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .fade-in {
+      opacity: 1 !important;
+    }
+
+    .blink {
+      animation: blink 0.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    @media (max-width: 768px) {
+  #hud {
+    font-size: 28px;
+    top: 20px;
+    left: 20px;
+  }
+
+  #instructions {
+    font-size: 18px;
+    bottom: 20px;
+  }
+
+  #gameOver {
+    font-size: 36px;
+  }
+
+  #powerupAlert {
+    font-size: 20px;
+    top: 80px;
+    right: 20px;
+  }
+}
+  </style>
+</head>
+<body>
+  <div id="mobileControls">
+  <div class="dpad">
+    <button class="btn up" data-dir="ArrowUp">▲</button>
+    <div>
+      <button class="btn left" data-dir="ArrowLeft">◀</button>
+      <button class="btn right" data-dir="ArrowRight">▶</button>
+    </div>
+    <button class="btn down" data-dir="ArrowDown">▼</button>
+  </div>
+  <button class="btn shoot" id="shootBtn">🔥</button>
+</div>
+
+  <div id="hud">
+    <div>Score: <span id="score">0</span></div>
+    <div>Health: <span id="health">100</span></div>
+    <div>Level: <span id="level">1</span></div>
+    <div>Weapon: <span id="weapon">Basic</span></div>
+  </div>
+  
+  <div id="gameOver">
+    <div>GAME OVER</div>
+    <div style="font-size: 24px; margin-top: 20px;">Final Score: <span id="finalScore">0</span></div>
+    <div style="font-size: 18px; margin-top: 20px;">Press R to Restart</div>
+  </div>
+  
+  <div id="powerupAlert">Power-up Collected!</div>
+  
+  <div id="instructions">
+    Arrow Keys: Move | Space: Shoot | R: Restart (when game over)
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script>
+  let scene, camera, renderer;
+  let ship, bullets = [], enemies = [], powerups = [], particles = [];
+  let score = 0, health = 100, level = 1, gameOver = false;
+  let weaponType = 'basic', weaponTimer = 0;
+  let keys = {};
+  let clock = new THREE.Clock();
+  let enemySpawnTimer = 0, powerupSpawnTimer = 0;
+  let particleSystem;
+
+  // Game configuration
+  const config = {
+    shipSpeed: 12,
+    bulletSpeed: 35,
+    enemySpeed: 8,
+    enemiesPerLevel: 3,
+    powerupChance: 0.3
+  };
+
+  init();
+  animate();
+
+  function init() {
+
+    setupMobileControls();
+
+
+    scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x000011, 50, 200);
+
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 8, 10);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    // Enhanced lighting
+    const ambient = new THREE.AmbientLight(0x333366, 0.4);
+    scene.add(ambient);
+    
+    const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    mainLight.position.set(10, 10, 10);
+    mainLight.castShadow = true;
+    scene.add(mainLight);
+
+    // Create ship with better geometry
+    createShip();
+    
+    // Create starfield with animation
+    createStarfield();
+    
+    // Initialize particle system
+    createParticleSystem();
+
+    // Spawn initial enemies
+    for (let i = 0; i < config.enemiesPerLevel + level - 1; i++) {
+      addEnemy();
+    }
+
+    // Input handlers
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', e => keys[e.code] = false);
+
+    window.addEventListener('resize', onWindowResize);
+  }
+
+  function createShip() {
+    const shipGroup = new THREE.Group();
+    
+    // Main body
+    const bodyGeo = new THREE.ConeGeometry(0.6, 2, 8);
+    const bodyMat = new THREE.MeshStandardMaterial({ 
+      color: 0x00ffff, 
+      emissive: 0x004444,
+      metalness: 0.7,
+      roughness: 0.3
+    });
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    body.rotation.x = Math.PI / 2;
+    shipGroup.add(body);
+
+    // Wings
+    const wingGeo = new THREE.BoxGeometry(0.3, 0.1, 1);
+    const wingMat = new THREE.MeshStandardMaterial({  });
+    
+    const leftWing = new THREE.Mesh(wingGeo, wingMat);
+    leftWing.position.set(-0.8, 0, 0.3);
+    shipGroup.add(leftWing);
+    
+    const rightWing = new THREE.Mesh(wingGeo, wingMat);
+    rightWing.position.set(0.8, 0, 0.3);
+    shipGroup.add(rightWing);
+
+    // Engine glow
+    const glowGeo = new THREE.SphereGeometry(0.2, 8, 8);
+    const glowMat = new THREE.MeshBasicMaterial({ 
+      color: 0x00ffff, 
+      transparent: true, 
+      opacity: 0.8 
+    });
+    const glow = new THREE.Mesh(glowGeo, glowMat);
+    glow.position.z = 0.8;
+    shipGroup.add(glow);
+
+    ship = shipGroup;
+    ship.position.set(0, 0, -5);
+    scene.add(ship);
+  }
+
+  function createStarfield() {
+    const starsGeo = new THREE.BufferGeometry();
+    const starCount = 2000;
+    const positions = [];
+    const colors = [];
+    
+    for (let i = 0; i < starCount; i++) {
+      positions.push(
+        (Math.random() - 0.5) * 400,
+        (Math.random() - 0.5) * 400,
+        -Math.random() * 400
+      );
+      
+      const color = new THREE.Color();
+      color.setHSL(Math.random() * 0.3 + 0.5, 0.5, Math.random() * 0.5 + 0.5);
+      colors.push(color.r, color.g, color.b);
+    }
+    
+    starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    starsGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    
+    const starsMat = new THREE.PointsMaterial({ 
+      size: 2, 
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8
+    });
+    
+    const stars = new THREE.Points(starsGeo, starsMat);
+    scene.add(stars);
+  }
+
+  function createParticleSystem() {
+    const particleGeo = new THREE.BufferGeometry();
+    const particleCount = 100;
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const lifetimes = new Float32Array(particleCount);
+    
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeo.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+    particleGeo.setAttribute('lifetime', new THREE.BufferAttribute(lifetimes, 1));
+    
+    const particleMat = new THREE.PointsMaterial({
+      color: 0xffaa00,
+      size: 3,
+      transparent: true,
+      opacity: 0.8
+    });
+    
+    particleSystem = new THREE.Points(particleGeo, particleMat);
+    scene.add(particleSystem);
+  }
+
+  function handleKeyDown(e) {
+    keys[e.code] = true;
+    
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (!gameOver) shoot();
+    }
+    
+    if (e.code === 'KeyR' && gameOver) {
+      restartGame();
+    }
+  }
+
+  function shoot() {
+    const bulletGeo = new THREE.SphereGeometry(0.15, 8, 8);
+    let bulletMat;
+    
+    switch (weaponType) {
+      case 'rapid':
+        bulletMat = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+        createBullet(ship.position.clone(), bulletMat, bulletGeo);
+        break;
+      case 'spread':
+        bulletMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        for (let i = -1; i <= 1; i++) {
+          const pos = ship.position.clone();
+          pos.x += i * 0.5;
+          createBullet(pos, bulletMat, bulletGeo, i * 0.1);
+        }
+        break;
+      default:
+        bulletMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        createBullet(ship.position.clone(), bulletMat, bulletGeo);
+    }
+  }
+
+  function createBullet(position, material, geometry, spread = 0) {
+    const bullet = new THREE.Mesh(geometry, material);
+    bullet.position.copy(position);
+    bullet.spread = spread;
+    bullets.push(bullet);
+    scene.add(bullet);
+  }
+
+  function addEnemy() {
+    const enemyTypes = ['basic', 'fast', 'heavy'];
+    const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+    
+    let geo, mat, enemy;
+    
+    switch (type) {
+      case 'fast':
+        geo = new THREE.ConeGeometry(0.5, 1, 6);
+        mat = new THREE.MeshStandardMaterial({ color: 0xff8800 });
+        enemy = new THREE.Mesh(geo, mat);
+        enemy.userData = { type: 'fast', health: 1, speed: 15, points: 150 };
+        break;
+      case 'heavy':
+        geo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+        mat = new THREE.MeshStandardMaterial({ color: 0x880000 });
+        enemy = new THREE.Mesh(geo, mat);
+        enemy.userData = { type: 'heavy', health: 3, speed: 6, points: 300 };
+        break;
+      default:
+        geo = new THREE.BoxGeometry(1, 1, 1);
+        mat = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+        enemy = new THREE.Mesh(geo, mat);
+        enemy.userData = { type: 'basic', health: 1, speed: config.enemySpeed, points: 100 };
+    }
+    
+    enemy.position.set(
+      (Math.random() - 0.5) * 25,
+      (Math.random() - 0.5) * 25,
+      -60 - Math.random() * 40
+    );
+    
+    enemy.rotation.set(
+      Math.random() * Math.PI,
+      Math.random() * Math.PI,
+      Math.random() * Math.PI
+    );
+    
+    enemies.push(enemy);
+    scene.add(enemy);
+  }
+
+  function addPowerup() {
+    const types = ['health', 'rapidFire', 'spreadShot'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    
+    const geo = new THREE.OctahedronGeometry(0.8);
+    let mat;
+    
+    switch (type) {
+      case 'health':
+        mat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        break;
+      case 'rapidFire':
+        mat = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+        break;
+      case 'spreadShot':
+        mat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+        break;
+    }
+    
+    const powerup = new THREE.Mesh(geo, mat);
+    powerup.position.set(
+      (Math.random() - 0.5) * 20,
+      (Math.random() - 0.5) * 20,
+      -30 - Math.random() * 20
+    );
+    powerup.userData = { type };
+    
+    powerups.push(powerup);
+    scene.add(powerup);
+  }
+
+  function createExplosion(position) {
+    for (let i = 0; i < 10; i++) {
+      const particleGeo = new THREE.SphereGeometry(0.1, 4, 4);
+      const particleMat = new THREE.MeshBasicMaterial({ 
+        color: new THREE.Color().setHSL(Math.random() * 0.1 + 0.1, 1, 0.5)
+      });
+      const particle = new THREE.Mesh(particleGeo, particleMat);
+      
+      particle.position.copy(position);
+      particle.velocity = new THREE.Vector3(
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 20
+      );
+      particle.life = 1.0;
+      
+      particles.push(particle);
+      scene.add(particle);
+    }
+  }
+
+  function checkCollisions() {
+    // Bullet-Enemy collisions
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      for (let j = enemies.length - 1; j >= 0; j--) {
+        if (bullets[i] && enemies[j] && 
+            bullets[i].position.distanceTo(enemies[j].position) < 1.2) {
+          
+          const enemy = enemies[j];
+          enemy.userData.health--;
+          
+          scene.remove(bullets[i]);
+          bullets.splice(i, 1);
+          
+          if (enemy.userData.health <= 0) {
+            createExplosion(enemy.position);
+            scene.remove(enemy);
+            enemies.splice(j, 1);
+            score += enemy.userData.points;
+            
+            // Chance to spawn powerup
+            if (Math.random() < config.powerupChance) {
+              addPowerup();
+            }
+            
+            // Check level progression
+            if (enemies.length === 0) {
+              level++;
+              for (let k = 0; k < config.enemiesPerLevel + level - 1; k++) {
+                setTimeout(() => addEnemy(), k * 500);
+              }
+            }
+          }
+          
+          updateHUD();
+          break;
+        }
+      }
+    }
+    
+    // Ship-Enemy collisions
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      if (enemies[i] && ship.position.distanceTo(enemies[i].position) < 1.5) {
+        createExplosion(enemies[i].position);
+        scene.remove(enemies[i]);
+        enemies.splice(i, 1);
+        health -= 25;
+        
+        if (health <= 0) {
+          endGame();
+        }
+        updateHUD();
+      }
+    }
+    
+    // Ship-Powerup collisions
+    for (let i = powerups.length - 1; i >= 0; i--) {
+      if (powerups[i] && ship.position.distanceTo(powerups[i].position) < 1.5) {
+        const powerup = powerups[i];
+        
+        switch (powerup.userData.type) {
+          case 'health':
+            health = Math.min(100, health + 25);
+            break;
+          case 'rapidFire':
+            weaponType = 'rapid';
+            weaponTimer = 300; // 5 seconds at 60fps
+            break;
+          case 'spreadShot':
+            weaponType = 'spread';
+            weaponTimer = 300;
+            break;
+        }
+        
+        showPowerupAlert();
+        scene.remove(powerup);
+        powerups.splice(i, 1);
+        updateHUD();
+      }
+    }
+  }
+
+  function showPowerupAlert() {
+    const alert = document.getElementById('powerupAlert');
+    alert.classList.add('fade-in');
+    setTimeout(() => alert.classList.remove('fade-in'), 2000);
+  }
+
+  function updateHUD() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('health').textContent = health;
+    document.getElementById('level').textContent = level;
+    document.getElementById('weapon').textContent = 
+      weaponType === 'basic' ? 'Basic' : 
+      weaponType === 'rapid' ? 'Rapid Fire' : 'Spread Shot';
+  }
+
+  function endGame() {
+    gameOver = true;
+    document.getElementById('finalScore').textContent = score;
+    document.getElementById('gameOver').style.display = 'block';
+    document.getElementById('gameOver').classList.add('blink');
+  }
+
+  function restartGame() {
+    // Reset game state
+    gameOver = false;
+    score = 0;
+    health = 100;
+    level = 1;
+    weaponType = 'basic';
+    weaponTimer = 0;
+    
+    // Clear objects
+    bullets.forEach(bullet => scene.remove(bullet));
+    enemies.forEach(enemy => scene.remove(enemy));
+    powerups.forEach(powerup => scene.remove(powerup));
+    particles.forEach(particle => scene.remove(particle));
+    
+    bullets = [];
+    enemies = [];
+    powerups = [];
+    particles = [];
+    
+    // Reset ship position
+    ship.position.set(0, 0, -5);
+    
+    // Hide game over screen
+    document.getElementById('gameOver').style.display = 'none';
+    document.getElementById('gameOver').classList.remove('blink');
+    
+    // Spawn initial enemies
+    for (let i = 0; i < config.enemiesPerLevel; i++) {
+      addEnemy();
+    }
+    
+    updateHUD();
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    if (gameOver) return;
+    
+    const delta = clock.getDelta();
+    const time = clock.getElapsedTime();
+
+    // Ship movement with bounds checking
+    const moveSpeed = config.shipSpeed * delta;
+    if (keys['ArrowLeft'] ) ship.position.x -= moveSpeed;
+    if (keys['ArrowRight'] ) ship.position.x += moveSpeed;
+    if (keys['ArrowUp'] ) ship.position.y += moveSpeed;
+    if (keys['ArrowDown'] ) ship.position.y -= moveSpeed;
+
+    // Ship animation
+    ship.rotation.z = Math.sin(time * 4) * 0.1;
+    ship.children[3].material.opacity = 0.6 + Math.sin(time * 10) * 0.2; // Engine glow
+
+    // Update weapon timer
+    if (weaponTimer > 0) {
+      weaponTimer--;
+      if (weaponTimer === 0) {
+        weaponType = 'basic';
+        updateHUD();
+      }
+    }
+
+    // Update bullets
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      const bullet = bullets[i];
+      bullet.position.z -= config.bulletSpeed * delta;
+      bullet.position.x += (bullet.spread || 0) * config.bulletSpeed * delta;
+      
+      if (bullet.position.z < -200) {
+        scene.remove(bullet);
+        bullets.splice(i, 1);
+      }
+    }
+
+    // Update enemies
+    enemies.forEach(enemy => {
+      enemy.position.z += enemy.userData.speed * delta;
+      enemy.rotation.x += delta;
+      enemy.rotation.y += delta * 0.5;
+      
+      if (enemy.position.z > camera.position.z + 5) {
+        enemy.position.z = -80 - Math.random() * 40;
+        enemy.position.x = (Math.random() - 0.5) * 25;
+        enemy.position.y = (Math.random() - 0.5) * 25;
+      }
+    });
+
+    // Update powerups
+    powerups.forEach(powerup => {
+      powerup.position.z += 8 * delta;
+      powerup.rotation.x += delta * 2;
+      powerup.rotation.y += delta * 3;
+      
+      if (powerup.position.z > camera.position.z + 5) {
+        scene.remove(powerup);
+        powerups.splice(powerups.indexOf(powerup), 1);
+      }
+    });
+
+    // Update particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const particle = particles[i];
+      particle.position.add(particle.velocity.clone().multiplyScalar(delta));
+      particle.life -= delta * 2;
+      particle.material.opacity = particle.life;
+      
+      if (particle.life <= 0) {
+        scene.remove(particle);
+        particles.splice(i, 1);
+      }
+    }
+
+    checkCollisions();
+    renderer.render(scene, camera);
+  }
+  function setupMobileControls() {
+  if (/Mobi|Android/i.test(navigator.userAgent)) {
+    document.getElementById('mobileControls').style.display = 'block';
+
+    document.querySelectorAll('[data-dir]').forEach(button => {
+      const dir = button.dataset.dir;
+      button.addEventListener('touchstart', () => keys[dir] = true);
+      button.addEventListener('touchend', () => keys[dir] = false);
+    });
+
+    document.getElementById('shootBtn').addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (!gameOver) shoot();
+    });
+  }
+}
+
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+</script>
+</body>
+</html>
