@@ -19,7 +19,7 @@ a {
     
 }
 
-.page-container a:hover {
+.page-container a {
     border-style: solid;
     border-radius: 5px;
     border-width: 1px;
@@ -97,7 +97,7 @@ footer {
     opacity: 50%;
     position: fixed;
     top: 20px;
-    left: 30%;
+    right: 5%;
     /* border-style:solid; */
     display: flex;
     justify-content: left;
@@ -105,8 +105,14 @@ footer {
 }
 .page-nav-menu a {
     color: black;
-    margin: 10px;
-    
+    margin: 2px;
+    padding: 10px;
+    border-radius: 10px;
+    border-color: black;
+    border-style: solid;   
+    background-color: #81cb32b0;
+    /* opacity: 100; */
+    border-width: 1px;
 
 }
 .al-g-box, .background-window{
@@ -123,4 +129,9 @@ footer {
     width: 100%;
 }
 
+ /* @media (max-width: 768px) {
+    .page-nav-menu {
+        flex-direction: column;
+    }
+ } */
 

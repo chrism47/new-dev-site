@@ -65,7 +65,7 @@ let scene, camera, renderer;
 
         const positions = starGeo.attributes.position.array;
         for (let i = 0; i < positions.length; i += 3) {
-          positions[i + 2] += 0.25; // Move forward (z-axis)
+          positions[i + 2] += 0.1; // Move forward (z-axis)
 
           if (positions[i + 2] > 5) {
             positions[i] = (Math.random() - 0.5) * 100;

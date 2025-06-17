@@ -1,5 +1,4 @@
 from flask import Flask, render_template
-from flask_ckeditor import CKEditor, CKEditorField
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, StringField
 from flask_sqlalchemy import SQLAlchemy
@@ -9,8 +8,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 # app.config['SECRET_KEY'] = 'your-secret-key'
-# app.config['CKEDITOR_PKG_TYPE'] = 'standard'  # or 'basic', 'full'
-# app.config['CKEDITOR_ENABLE_CODESNIPPET'] = True
 
 # db = SQLAlchemy()
 # class Post(db.Model):
@@ -20,13 +17,10 @@ app = Flask(__name__)
 #     content = db.Column(db.String(80), nullable=False)
 
 
-
-# ckeditor = CKEditor(app)
 # class MyForm(FlaskForm):
 #     title = StringField('Title')
 #     subtitle = StringField('Subtitle')
 #     date = StringField('Date')  # Date stored as a string
-#     content = CKEditorField('Content')
 #     submit = SubmitField('Submit')
 
 @app.route('/')
@@ -52,7 +46,7 @@ def index():
 
 @app.route('/shaders')
 def shaders():  
-    return render_template('book-of-shaders.html')
+    return render_template('shaders.html')
 
 @app.route('/work')
 def work():  
@@ -66,51 +60,10 @@ def space_invaders():
 def al_g():  
     return render_template('al-g.html')
 
-# @app.route('/notebooks')
-# def notebooks():
-
-#     file_dir = os.listdir(MD_PATH)
-    
-#     preview_text = []
-#     text_count = len(file_dir)
-#     for file in range(len(file_dir)):
-        
-#         filepath = os.path.join(MD_PATH, file_dir[file])
-        
-#         with open(filepath, 'r', encoding='utf-8') as f:
-#             lines = f.readlines(200)
-#             print(lines)
-#             preview_text.append({
-#                 "title": lines[0],
-#                 "preview": lines[2:]
-#             })
-    
-#     print(len(file_dir))
-#     return render_template('notebooks.html', md_files=file_dir, preview_text=preview_text, text_count=text_count)
-
-# @app.route('/notebooks/<filename>')
-# def show_markdown(filename):
-#     if not filename.endswith('.md'):
-#         filename += '.md'
-
-#     md_path = os.path.join(MD_PATH, filename)
-
-#     if not os.path.exists(md_path):
-#         LookupError(404)
-
-#     with open(md_path, 'r', encoding='utf-8') as f:
-#         content = f.read()
-    
-#     return render_template("note.html", content=content, filename=filename)
-
-
 @app.route('/info')
 def info():
     return render_template('info.html')
 
-@app.route('/admin')
-def admin():  
-    return render_template('admin.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
