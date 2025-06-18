@@ -191,6 +191,18 @@ footer {
 
     button.prev { left: 10px; }
     button.next { right: 10px; }
+
+    .vibe-code.label {
+        position: absolute;
+        border-radius: 5px;
+        right: 10%;
+        bottom: 10%;
+        background-color: rgba(250, 235, 215, 0.514);
+        color: #000000;
+        padding: 2px;
+        border-width: 1px;
+        border-style: solid;
+    }
 @media (max-width:700px){
     .page-container div.animated-selection {
             width: 100%;

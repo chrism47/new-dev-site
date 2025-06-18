@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 let scene, camera, renderer, particleSystem;
-  const particleCount = 200;
+  const particleCount = 300;
   const positions = [];
   const velocities = [];
   const lifetimes = [];
@@ -55,7 +55,7 @@ let scrollDelta = 0;
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       vertexColors: true,
-      opacity: 0.3,
+      opacity: 0.1,
     });
 
     const colors = new Float32Array(particleCount * 6);
@@ -79,7 +79,7 @@ let scrollDelta = 0;
 
   window.addEventListener('scroll', () => {
       scrollY = window.scrollY;
-        scrollDelta = Math.sin(scrollY - lastScrollY);
+        scrollDelta = Math.sin(scrollY - lastScrollY) /Math.cos(scrollY - lastScrollY);
         lastScrollY = scrollY;
 
     })
@@ -87,8 +87,8 @@ let scrollDelta = 0;
     requestAnimationFrame(animate);
     const pos = geometry.attributes.position.array;
     const colors = geometry.attributes.color.array;
-    camera.rotation.z += .005 * scrollDelta;
-    camera.translateZ(.005 * -scrollDelta);
+    // camera.rotation.z += .005 * scrollDelta;
+    // camera.translateZ(.005 * -scrollDelta);
     for (let i = 0; i < particleCount; i++) {
       const idx = i * 3;
       lifetimes[i]++;
@@ -96,12 +96,12 @@ let scrollDelta = 0;
 
       // Reset particle if it "dies"
       if (lifetimes[i] > maxLifetime) {
-        pos[idx] = (Math.random() - 0.5) * 30;
+        pos[idx] = (Math.random() - 0.5) * 12;
         pos[idx + 1] = 0;
-        pos[idx + 2] = (Math.random() - 0.5) * 2;
-        velocities[idx] = (Math.random() - 0.5) * 2;
-        velocities[idx + 1] = 0.05 + Math.random() * 5;
-        velocities[idx + 2] = (Math.random() - 0.5) * 0.2;
+        pos[idx + 2] = (Math.random() - 0.5) * 20 ;
+        velocities[idx] = (Math.random() - 0.5) * 5;
+        velocities[idx + 1] = 0.05 + Math.random() * 2 ;
+        velocities[idx + 2] = (Math.random() - 0.5) * 5  *scrollDelta;
         lifetimes[i] = 0;
       }
 
