@@ -60,6 +60,12 @@ def work():
 def space_invaders():  
     return render_template('vibe-codes/space-invaders.html')
 
+@app.route('/shape-quest')
+def shape_quest():  
+    return render_template('vibe-codes/shape-quest.html')
+
+
+
 @app.route('/al-g')
 def al_g():  
     return render_template('al-g.html')

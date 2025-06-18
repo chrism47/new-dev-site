@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Shape Quest</title>
     <style>
         body {
@@ -42,7 +42,8 @@
             padding: 20px;
             border-radius: 10px;
             border: 2px solid #4a90e2;
-            max-width: 600px;
+            max-width: 80%;
+            width: 600px;
             text-align: center;
             display: none;
         }
@@ -62,6 +63,76 @@
         .story-active {
             display: block !important;
         }
+
+        /* --- Mobile Controller Styles --- */
+        #mobileControls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            z-index: 101;
+            display: none; /* Hidden by default */
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .mobile-controls-active {
+            display: flex !important;
+        }
+
+        #dpad {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        #actionButtons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .mobile-btn {
+            background: rgba(74, 144, 226, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            color: white;
+            position: absolute;
+            user-select: none; /* Prevents text selection on hold */
+            -webkit-user-select: none; /* For Safari */
+        }
+
+        /* D-Pad Button Styling */
+        #dpad .mobile-btn {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+        #dpad .mobile-btn.up { top: 0; left: 50px; }
+        #dpad .mobile-btn.down { bottom: 0; left: 50px; }
+        #dpad .mobile-btn.left { top: 50px; left: 0; }
+        #dpad .mobile-btn.right { top: 50px; right: 0; }
+
+        /* Action Button Styling */
+        #actionButtons .mobile-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            margin: 10px;
+            position: relative; /* Override absolute positioning */
+        }
+
+        .mobile-btn:active {
+            background: rgba(74, 144, 226, 0.8);
+        }
+
     </style>
 </head>
 <body>
@@ -85,6 +156,19 @@
             <div id="storyText"></div>
             <div style="margin-top: 10px; font-size: 12px;">Press E to continue</div>
         </div>
+
+        <div id="mobileControls">
+            <div id="dpad">
+                <button class="mobile-btn up" data-key="KeyW">&#9650;</button>
+                <button class="mobile-btn down" data-key="KeyS">&#9660;</button>
+                <button class="mobile-btn left" data-key="KeyA">&#9664;</button>
+                <button class="mobile-btn right" data-key="KeyD">&#9654;</button>
+            </div>
+            <div id="actionButtons">
+                <button id="interactBtn" class="mobile-btn">Interact</button>
+                <button id="attackBtn" class="mobile-btn">Attack</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -106,7 +190,7 @@
                 this.setupWorld();
                 this.setupEnemies();
                 this.setupNPCs();
-                this.setupControls();
+                this.setupControls(); // This will now set up mobile controls too
                 this.setupStory();
                 
                 this.gameState = {
@@ -328,23 +412,59 @@
             setupControls() {
                 this.keys = {};
                 
+                // --- Keyboard Controls ---
                 document.addEventListener('keydown', (e) => {
                     this.keys[e.code] = true;
-                    
-                    if (e.code === 'KeyE') {
-                        if (this.gameState.inStory) {
-                            this.continueStory();
-                        } else {
-                            this.checkInteractions();
-                        }
-                    }
+                    if (e.code === 'KeyE') this.handleInteraction();
                 });
                 
                 document.addEventListener('keyup', (e) => {
                     this.keys[e.code] = false;
                 });
+
+                // --- Mobile/Touch Controls ---
+                if ('ontouchstart' in window) {
+                    document.getElementById('mobileControls').classList.add('mobile-controls-active');
+                    document.getElementById('controls').style.display = 'none'; // Hide keyboard controls info
+
+                    // D-Pad listeners
+                    const dpadButtons = document.querySelectorAll('#dpad .mobile-btn');
+                    dpadButtons.forEach(button => {
+                        button.addEventListener('touchstart', (e) => {
+                            e.preventDefault();
+                            this.keys[e.currentTarget.dataset.key] = true;
+                        });
+                        button.addEventListener('touchend', (e) => {
+                            e.preventDefault();
+                            this.keys[e.currentTarget.dataset.key] = false;
+                        });
+                    });
+
+                    // Action Button listeners
+                    document.getElementById('attackBtn').addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        this.keys['Space'] = true;
+                    });
+                     document.getElementById('attackBtn').addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        this.keys['Space'] = false;
+                    });
+                     document.getElementById('interactBtn').addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        this.handleInteraction();
+                    });
+                }
             }
             
+            // Centralized function to handle 'E' key or Interact button
+            handleInteraction() {
+                if (this.gameState.inStory) {
+                    this.continueStory();
+                } else {
+                    this.checkInteractions();
+                }
+            }
+
             setupStory() {
                 this.storySequence = [
                     "Long ago, in the realm of Geometria, shapes lived in harmony...",
@@ -582,11 +702,12 @@
             updateUI() {
                 document.getElementById('health').textContent = this.gameState.health;
                 document.getElementById('level').textContent = this.gameState.level;
-                document.getElementById('xp').textContent = this.gameState.xp;
+                document.getElementById('xp').textContent = `${this.gameState.xp}/${this.gameState.xpToNext}`;
                 document.getElementById('area').textContent = this.gameState.currentArea;
             }
             
             gameOver() {
+                this.gameState.inStory = true; // Stop player movement
                 document.getElementById('storyText').textContent = 
                     "Game Over! The realm falls to the Crimson Cubes... Refresh to try again!";
                 document.getElementById('story').classList.add('story-active');
