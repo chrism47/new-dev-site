@@ -55,7 +55,7 @@ let scrollDelta = 0;
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       vertexColors: true,
-      opacity: 0.08,
+      opacity: 0.3,
     });
 
     const colors = new Float32Array(particleCount * 6);
