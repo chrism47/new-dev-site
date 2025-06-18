@@ -86,8 +86,8 @@ void main() {
   float n = noise(uv * 50.0 + uTime * 0.1);
   float final = wave + rippleSum + (n - 0.5) * 0.1;
 
-vec3 base = vec3(0.1, 0.5, 0.2);                // background color
-vec3 rippleColor = vec3(0.01, 0.9, .1);         // ripple ring color (light cyan)
+vec3 base = vec3(0.0, 0.01, 0.02);                // background color
+vec3 rippleColor = vec3(0.01, 0.7, .1);         // ripple ring color (light cyan)
 
 vec3 color = base + wave * 0.8 + rippleSum * rippleColor;  
 gl_FragColor = vec4(color, 1);
