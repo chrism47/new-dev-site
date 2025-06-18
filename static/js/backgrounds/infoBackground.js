@@ -61,8 +61,8 @@ float noise(vec2 st) {
 void main() {
   vec2 uv = gl_FragCoord.xy / uResolution;
   
-  float wave = 0.03 * sin(uv.y * 30.0 + uTime * 6.0) +
-               0.02 * sin(uv.x * 40.0 - uTime * 1.0);
+  float wave = 0.01 * noise(uv * 30.0)*sin(uv.y * 30.0 + uTime * 6.0) +
+               0.02 * noise(uv * 25.0)* sin(uv.x * 40.0 - uTime * 1.0);
 
   float rippleSum = 0.0;
   for (int i = 0; i < ${MAX_RIPPLES}; i++) {
@@ -71,7 +71,7 @@ void main() {
   float t = uTime - uRippleStartTimes[i];
   if (t < 2.0) {
     float dist = distance(uv, uRipplePositions[i]);
-    float n = noise(uv * 30.0 + float(i));
+    float n = noise(uv * 25.0 + float(i));
     dist += (n - 0.5) * 0.02;
 
     float radius = t * 0.3;
@@ -86,11 +86,11 @@ void main() {
   float n = noise(uv * 50.0 + uTime * 0.1);
   float final = wave + rippleSum + (n - 0.5) * 0.1;
 
-vec3 base = vec3(0.0, 0.01, 0.02);                // background color
-vec3 rippleColor = vec3(0.01, 0.7, .1);         // ripple ring color (light cyan)
+vec3 base = vec3(0.0, 0.06, 0.02);                // background color
+vec3 rippleColor = vec3(0.01, 0.5, .1);         // ripple ring color (light cyan)
 
 vec3 color = base + wave * 0.8 + rippleSum * rippleColor;  
-gl_FragColor = vec4(color, 1);
+gl_FragColor = vec4(color, 0.7);
 }
 
   `,
