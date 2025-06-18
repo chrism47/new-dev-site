@@ -29,39 +29,70 @@ const material = new THREE.ShaderMaterial({
   vertexShader: `
     void main() {
       gl_Position = vec4(position, 1.0);
+      
     }
   `,
   fragmentShader: `
     precision highp float;
 
-    uniform float uTime;
-    uniform vec2 uResolution;
-    uniform vec2 uRipplePositions[${MAX_RIPPLES}];
-    uniform float uRippleStartTimes[${MAX_RIPPLES}];
-    uniform int uRippleCount;
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uRipplePositions[${MAX_RIPPLES}];
+uniform float uRippleStartTimes[${MAX_RIPPLES}];
+uniform int uRippleCount;
 
-    void main() {
-      vec2 uv = gl_FragCoord.xy / uResolution;
-      
-      float wave = 0.03 * sin(uv.y * 30.0 + uTime *10.0) +
-                   0.02 * sin(uv.x * 40.0 - uTime * 1.5);
+float random(vec2 st) {
+  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
 
-      float rippleSum = 0.0;
-      for (int i = 0; i < ${MAX_RIPPLES}; i++) {
-        if (i >= uRippleCount) break;
+float noise(vec2 st) {
+  vec2 i = floor(st);
+  vec2 f = fract(st);
+  float a = random(i);
+  float b = random(i + vec2(1.0, 0.0));
+  float c = random(i + vec2(0.0, 1.0));
+  float d = random(i + vec2(1.0, 1.0));
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(a, b, u.x) +
+         (c - a) * u.y * (1.0 - u.x) +
+         (d - b) * u.x * u.y;
+}
 
-        float t = uTime - uRippleStartTimes[i];
-        if (t < 2.0) {
-          float dist = distance(uv, uRipplePositions[i]);
-          rippleSum += sin(60.0 * dist - t * 5.0) * exp(-4.0 * dist) * exp(-1.5 * t);
-        }
-      }
+void main() {
+  vec2 uv = gl_FragCoord.xy / uResolution;
+  
+  float wave = 0.03 * sin(uv.y * 30.0 + uTime * 6.0) +
+               0.02 * sin(uv.x * 40.0 - uTime * 1.0);
 
-      float final = wave + rippleSum;
-      vec3 color = vec3(0.1, 0.5, 0.2) + final * .3;
+  float rippleSum = 0.0;
+  for (int i = 0; i < ${MAX_RIPPLES}; i++) {
+  if (i >= uRippleCount) break;
 
-      gl_FragColor = vec4(color, 1.0);
-    }
+  float t = uTime - uRippleStartTimes[i];
+  if (t < 2.0) {
+    float dist = distance(uv, uRipplePositions[i]);
+    float n = noise(uv * 30.0 + float(i));
+    dist += (n - 0.5) * 0.02;
+
+    float radius = t * 0.3;
+    float ring = smoothstep(0.05, 0.0, abs(dist - radius));
+    float ripple = ring * (1.0 - dist * 0.5) * exp(-1.5 * t);
+    rippleSum += ripple;
+  }
+}
+
+
+
+  float n = noise(uv * 50.0 + uTime * 0.1);
+  float final = wave + rippleSum + (n - 0.5) * 0.1;
+
+vec3 base = vec3(0.1, 0.5, 0.2);                // background color
+vec3 rippleColor = vec3(0.01, 0.9, .1);         // ripple ring color (light cyan)
+
+vec3 color = base + wave * 0.8 + rippleSum * rippleColor;  
+gl_FragColor = vec4(color, 1);
+}
+
   `,
   transparent: true,
   
