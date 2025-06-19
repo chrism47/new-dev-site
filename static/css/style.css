@@ -18,13 +18,14 @@ a {
     text-decoration: none;   
 }
 .page-container a {
-    border-style: solid;
+    /* border-style: solid; */
     border-radius: 5px;
-    border-width: 1px;
-    border-color: var(--primary-green);
+    /* border-width: 1px; */
+    /* border-color: var(--primary-green); */
     display: inline-block; /* or block */
     padding: 10px;
     margin: 10px;  
+    box-shadow: 0 3px 12px 0 var(--primary-green);
 }
 .page-container #carousel-cont a {
     border-style: none;
@@ -75,7 +76,7 @@ footer {
     width: 96%;
     background-color: rgba(0, 0, 0, 0.767);
     border-width: 1px;
-    border-style: solid;
+    /* border-style: solid; */
     border-radius: 10px;
     padding: 10px;
     /* margin: 10px; */
@@ -103,16 +104,21 @@ footer {
     display: flex;
     justify-content: left;
     border-radius: 12px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
 }
 .page-nav-menu a {
+    background-color: #32cb583f;
     color: black;
     margin: 2px;
     padding: 10px;
     border-radius: 10px;
     border-color: black;
-    border-style: solid;   
-    background-color: var(--primary-green);
+    /* border-style: solid;    */
+    /* background-color: var(--primary-green); */
     border-width: 1px;
+    box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.308);
 }
 .al-g-box, .background-window{
     position: fixed;
@@ -184,6 +190,12 @@ button.next {
     padding: 2px;
     border-width: 1px;
     border-style: solid;
+}
+img.work-preview-img {
+    width: 12rem   
+}
+.work-preview-img p {
+    
 }
 @media (max-width:700px){
     :root {

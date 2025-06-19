@@ -5,9 +5,10 @@
         <p> An artistic CS project. al-g is a 3D art generator and a DSA visualizer currently
             in the very early stages of development. 
         </p>
+        <p>[PROJECT INFORMATION COMING SOON!]</p>
         <div id="threejs-container" class="al-g-box"></div> <!-- Placeholder for Three.js canvas -->
 
-        <form id="scene-controls">
+        <!-- <form id="scene-controls">
             <label>Wireframe: 
                 <input type="checkbox" id="wireframe"></label>
             <label>L   <input type="range" id="lightIntensity" min="0" max="2" step="0.1" value="1"></label>
@@ -29,9 +30,8 @@
                 <input type="range" id="rotationSpeedY" min="0" max="0.1" step="0.001" value="0.01" />
             </label>
             
-        </form>
+        </form> -->
         
     </div>
-    <!-- Your custom JavaScript -->
     <script type="module" src="{{ url_for('static', filename='js/al-g/al-g-test.js') }}"></script>
 {% endblock %}

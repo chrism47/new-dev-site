@@ -26,7 +26,7 @@ def work():
 #---------------------------PROJECTS
 @app.route('/al-g')
 def al_g():  
-    return render_template('projects/al-g.html')
+    return render_template('projects/al-g/al-g.html')
 
 @app.route('/kicking-stickman')
 def kicking_stickman():  
