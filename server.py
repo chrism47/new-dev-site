@@ -1,61 +1,46 @@
 from flask import Flask, render_template
-from flask_wtf import FlaskForm
-from wtforms import SubmitField, StringField
-from flask_sqlalchemy import SQLAlchemy
+# from flask_wtf import FlaskForm
+# from wtforms import SubmitField, StringField
+# from flask_sqlalchemy import SQLAlchemy
 # from dotenv import load_dotenv
 
-# load_dotenv()
 
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'your-secret-key'
 
-# db = SQLAlchemy()
-# class Post(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     title = db.Column(db.String(80), nullable=False)
-#     subtitle = db.Column(db.String(80), nullable=False)
-#     content = db.Column(db.String(80), nullable=False)
-
-
-# class MyForm(FlaskForm):
-#     title = StringField('Title')
-#     subtitle = StringField('Subtitle')
-#     date = StringField('Date')  # Date stored as a string
-#     submit = SubmitField('Submit')
-
+#-----------------------------CORE
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('core/index.html')
 
 @app.route('/test')
 def test():
     return render_template('test.html')
 
-# @app.route('/editor', methods=['GET', 'POST'])
-# def editor():    
-#     form = MyForm()
-#     if form.validate_on_submit():
-#         form_data= {
-#             "title" : form.title.data,
-#             "subtitle": form.subtitle.data,
-#             "date": form.date.data,
-#             "content" : form.content.data   
-#         }
-#         return render_template('post-verify.html', form_data=form_data)
-#     return render_template('editor.html', form=form)
-
-# @app.route('/post-verify', methods=['GET', 'POST'])
-# def post_verify():
-#     return render_template('post-verify.html')
-
-@app.route('/shaders')
-def shaders():  
-    return render_template('shaders.html')
-
+@app.route('/info')
+def info():
+    return render_template('core/info.html')
 @app.route('/work')
 def work():  
-    return render_template('work.html')
+    return render_template('core/work.html')
 
+#---------------------------PROJECTS
+@app.route('/al-g')
+def al_g():  
+    return render_template('projects/al-g.html')
+
+@app.route('/kicking-stickman')
+def kicking_stickman():  
+    return render_template('projects/kicking-stickman.html')
+
+@app.route('/robot')
+def robot():  
+    return render_template('projects/robot.html')
+
+@app.route('/data-board')
+def data_board():  
+    return render_template('projects/data-board.html')
+
+#--------------------------VIBECODES
 @app.route('/space-invaders')
 def space_invaders():  
     return render_template('vibe-codes/space-invaders.html')
@@ -66,14 +51,7 @@ def shape_quest():
 
 
 
-@app.route('/al-g')
-def al_g():  
-    return render_template('al-g.html')
 
-@app.route('/info')
-def info():
-    return render_template('info.html')
-
-
+#-------------------------LOOP
 if __name__ == '__main__':
     app.run(debug=True)
