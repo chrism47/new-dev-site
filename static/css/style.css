@@ -223,7 +223,7 @@ img.work-preview-img {
 }
 @media (max-width:700px){
     :root {
-        --primary-green: #76b433; 
+        --primary-green: #5f9229; 
     }
     .page-container div.animated-selection {
             width: 100%;
