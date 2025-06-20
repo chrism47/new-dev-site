@@ -1,9 +1,38 @@
 {% extends "core/templates/base.html" %}
 {% block content %}
-    <div class="page-container">
+    <div class="page-container info">
+
         <p>
-            
+            The beauty of the world was sculpted with
+            the chisel of physics, and painted by the 
+            brush of biology. My question: what does a
+            pencil sketch have in common with a microprocessor
+            or a particle accelerator?
         </p>
+        <p>
+            <strong>The outputs</strong> of different tools for extracting
+            <strong>from the mind something new.</strong>
+        </p>
+        <p>
+            I'm not an accredited computer scientist 
+            or physicist. I'm an artist and entrepreneur 
+            who's studied systems technical, abstract, 
+            and natural, to better understand how ideas 
+            move through the world, and how to shape them. 
+            I study things like robotics, math, CS, physics, 
+            and philosophy not to know them, but to use 
+            them as instruments of invention.
+        </p>
+        <p>
+            Welcome to the site. I hope you find something you love,
+            or at least something to think about. 
+        </p>
+        <div class="info-link">
+        <img class="info-img"src="static/img/me.png" />
+        <a class href="/link-page">
+            Where to find me
+        </a>
+        </div>
     </div>
     <script type="module" src="{{ url_for('static', filename='js/backgrounds/infoBackground.js') }}"></script>
 {% endblock %}

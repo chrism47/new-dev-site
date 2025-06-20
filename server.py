@@ -4,7 +4,6 @@ from flask import Flask, render_template
 # from flask_sqlalchemy import SQLAlchemy
 # from dotenv import load_dotenv
 
-
 app = Flask(__name__)
 
 #-----------------------------CORE
@@ -22,6 +21,10 @@ def info():
 @app.route('/work')
 def work():  
     return render_template('core/work.html')
+@app.route('/link-page')
+def link_page():  
+    return render_template('core/link-page.html')
+
 
 #---------------------------PROJECTS
 @app.route('/al-g')

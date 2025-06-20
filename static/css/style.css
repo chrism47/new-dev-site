@@ -159,6 +159,7 @@ footer {
 }
 .carousel-img.active {
     display: block;
+    
 }
 button.prev, button.next {
     position: absolute;
@@ -180,6 +181,10 @@ button.prev {
 button.next { 
     right: 10px; 
 }
+.carousel-images a {
+    box-shadow: none;
+
+}
 .vibe-code.label {
     position: absolute;
     border-radius: 5px;
@@ -194,8 +199,27 @@ button.next {
 img.work-preview-img {
     width: 12rem   
 }
-.work-preview-img p {
-    
+#controls {
+      background: rgba(0,0,0,0.6);
+      padding: 10px;
+      z-index: 10;
+    }
+    input { width: 50px; }
+.info-link {
+    display: flex;
+    align-items: center;
+    /* justify-content: s-between; */
+}
+.info-img {
+    width: fit-content;
+    height: 10em;
+    margin: 2%;
+    /* display: block;
+    margin: 0 auto; */
+    border-radius: 5px;
+}
+.page-container.info a {
+    margin-left: 10%;
 }
 @media (max-width:700px){
     :root {

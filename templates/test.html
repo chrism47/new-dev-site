@@ -1,119 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Image Carousel</title>
+  <meta charset="UTF-8">
+  <title>Three.js Pendulum with Cannon</title>
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #f5f5f5;
-    }
-
-    .carousel {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      height: 60vw;
-      max-height: 400px;
-      margin: 40px auto;
-      overflow: hidden;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      background: #000;
-      touch-action: pan-y;
-    }
-
-    .carousel-images {
-      display: flex;
-      height: 100%;
-      transition: transform 0.5s ease;
-    }
-
-    .carousel-img {
-      min-width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: none;
-    }
-
-    .carousel-img.active {
-      display: block;
-    }
-
-    button.prev, button.next {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0,0,0,0.5);
-      border: none;
-      color: white;
-      padding: 10px;
-      cursor: pointer;
-      z-index: 1;
-      font-size: 1.5em;
-      user-select: none;
-    }
-
-    button.prev { left: 10px; }
-    button.next { right: 10px; }
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
   </style>
 </head>
 <body>
 
-  <div class="carousel" id="carousel">
-    <button class="prev">&#10094;</button>
-    <div class="carousel-images">
-      <img src="https://picsum.photos/id/1015/800/400" class="carousel-img active" />
-      <img src="https://picsum.photos/id/1016/800/400" class="carousel-img" />
-      <img src="https://picsum.photos/id/1018/800/400" class="carousel-img" />
-    </div>
-    <button class="next">&#10095;</button>
-  </div>
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
+// import { OrbitControls } from 'https://unpkg.com/three@0.160.1/examples/jsm/controls/OrbitControls.js';
+import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
 
-  <script>
-    const images = document.querySelectorAll('.carousel-img');
-    let currentIndex = 0;
+let scene, camera, renderer, controls;
+let cube, anchorMesh, stringLine;
+let world, cubeBody, constraint;
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let constraintRemoved = false;
 
-    function showImage(index) {
-      images.forEach((img, i) => {
-        img.classList.toggle('active', i === index);
-      });
-    }
+init();
+animate();
 
-    document.querySelector('.prev').addEventListener('click', () => {
-      currentIndex = (currentIndex - 1 + images.length) % images.length;
-      showImage(currentIndex);
-    });
+function init() {
+  // Scene setup
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf0f0f0);
 
-    document.querySelector('.next').addEventListener('click', () => {
-      currentIndex = (currentIndex + 1) % images.length;
-      showImage(currentIndex);
-    });
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
+  camera.position.set(0, 4, 6);
 
-    // Touch support
-    const carousel = document.getElementById('carousel');
-    let startX = 0;
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-    carousel.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-    });
+  // controls = new OrbitControls(camera, renderer.domElement);
 
-    carousel.addEventListener('touchend', (e) => {
-      const endX = e.changedTouches[0].clientX;
-      const diff = endX - startX;
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+  scene.add(ambientLight);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  dirLight.position.set(5, 10, 7);
+  scene.add(dirLight);
 
-      if (Math.abs(diff) > 50) {
-        if (diff < 0) {
-          currentIndex = (currentIndex + 1) % images.length;
-        } else {
-          currentIndex = (currentIndex - 1 + images.length) % images.length;
-        }
-        showImage(currentIndex);
-      }
-    });
-  </script>
+  // Floor
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshStandardMaterial({ color: 0x999999 })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  scene.add(floor);
+
+  // Anchor point (visual)
+  const anchorGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+  const anchorMaterial = new THREE.MeshStandardMaterial({ color: 0x3333ff });
+  anchorMesh = new THREE.Mesh(anchorGeometry, anchorMaterial);
+  anchorMesh.position.set(0, 3, 0);
+  scene.add(anchorMesh);
+
+  // Cube
+  const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+  scene.add(cube);
+
+  // String (line)
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+  const points = [anchorMesh.position, cube.position];
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+  stringLine = new THREE.Line(lineGeometry, lineMaterial);
+  scene.add(stringLine);
+
+  // Physics world
+  world = new CANNON.World({ gravity: new CANNON.Vec3(0, -9.82, 0) });
+
+  const floorBody = new CANNON.Body({
+    type: CANNON.Body.STATIC,
+    shape: new CANNON.Plane(),
+  });
+  floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+  world.addBody(floorBody);
+
+  // Cube physics body
+  cubeBody = new CANNON.Body({
+    mass: 1,
+    shape: new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5)),
+    position: new CANNON.Vec3(1, 2, 0),
+  });
+  world.addBody(cubeBody);
+
+  // Anchor physics (static body)
+  const anchorBody = new CANNON.Body({
+    mass: 0,
+    position: new CANNON.Vec3(0,2, 0),
+    shape: new CANNON.Sphere(.0000001),
+    type: CANNON.Body.STATIC
+  });
+  world.addBody(anchorBody);
+
+  // Constraint (like a rope)
+  constraint = new CANNON.PointToPointConstraint(
+    cubeBody, new CANNON.Vec3(0, .49, 0),
+    anchorBody, new CANNON.Vec3(0, 0, 0)
+  );
+  world.addConstraint(constraint);
+
+  // Event
+  window.addEventListener('pointerdown', onClick);
+  window.addEventListener('resize', onResize);
+}
+
+function onClick(event) {
+  if (constraintRemoved) return;
+
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(cube);
+
+  if (intersects.length > 0 && constraint) {
+    world.removeConstraint(constraint);
+    constraint = null;
+    constraintRemoved = true;
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  world.fixedStep();
+
+  // Sync cube with physics
+  cube.position.copy(cubeBody.position);
+  cube.quaternion.copy(cubeBody.quaternion);
+
+  // Update string line
+  stringLine.geometry.setFromPoints([
+    anchorMesh.position,
+    cube.position
+  ]);
+
+  // controls.update();
+  renderer.render(scene, camera);
+}
+
+function onResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+</script>
 
 </body>
 </html>
