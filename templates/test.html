@@ -1,158 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Three.js Pendulum with Cannon</title>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
-  </style>
+    <meta charset="UTF-8">
+    <title>DS Visualizer</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #ui { position: absolute; top: 10px; left: 10px; background: white; padding: 10px; z-index: 1; }
+    </style>
 </head>
 <body>
-
-<script type="module">
-import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
-// import { OrbitControls } from 'https://unpkg.com/three@0.160.1/examples/jsm/controls/OrbitControls.js';
-import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
-
-let scene, camera, renderer, controls;
-let cube, anchorMesh, stringLine;
-let world, cubeBody, constraint;
-let raycaster = new THREE.Raycaster();
-let mouse = new THREE.Vector2();
-let constraintRemoved = false;
-
-init();
-animate();
-
-function init() {
-  // Scene setup
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf0f0f0);
-
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
-  camera.position.set(0, 4, 6);
-
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  // controls = new OrbitControls(camera, renderer.domElement);
-
-  // Lighting
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-  scene.add(ambientLight);
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
-  dirLight.position.set(5, 10, 7);
-  scene.add(dirLight);
-
-  // Floor
-  const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(20, 20),
-    new THREE.MeshStandardMaterial({ color: 0x999999 })
-  );
-  floor.rotation.x = -Math.PI / 2;
-  scene.add(floor);
-
-  // Anchor point (visual)
-  const anchorGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-  const anchorMaterial = new THREE.MeshStandardMaterial({ color: 0x3333ff });
-  anchorMesh = new THREE.Mesh(anchorGeometry, anchorMaterial);
-  anchorMesh.position.set(0, 3, 0);
-  scene.add(anchorMesh);
-
-  // Cube
-  const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-  const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-  cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-  scene.add(cube);
-
-  // String (line)
-  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
-  const points = [anchorMesh.position, cube.position];
-  const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-  stringLine = new THREE.Line(lineGeometry, lineMaterial);
-  scene.add(stringLine);
-
-  // Physics world
-  world = new CANNON.World({ gravity: new CANNON.Vec3(0, -9.82, 0) });
-
-  const floorBody = new CANNON.Body({
-    type: CANNON.Body.STATIC,
-    shape: new CANNON.Plane(),
-  });
-  floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-  world.addBody(floorBody);
-
-  // Cube physics body
-  cubeBody = new CANNON.Body({
-    mass: 1,
-    shape: new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5)),
-    position: new CANNON.Vec3(1, 2, 0),
-  });
-  world.addBody(cubeBody);
-
-  // Anchor physics (static body)
-  const anchorBody = new CANNON.Body({
-    mass: 0,
-    position: new CANNON.Vec3(0,2, 0),
-    shape: new CANNON.Sphere(.0000001),
-    type: CANNON.Body.STATIC
-  });
-  world.addBody(anchorBody);
-
-  // Constraint (like a rope)
-  constraint = new CANNON.PointToPointConstraint(
-    cubeBody, new CANNON.Vec3(0, .49, 0),
-    anchorBody, new CANNON.Vec3(0, 0, 0)
-  );
-  world.addConstraint(constraint);
-
-  // Event
-  window.addEventListener('pointerdown', onClick);
-  window.addEventListener('resize', onResize);
-}
-
-function onClick(event) {
-  if (constraintRemoved) return;
-
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObject(cube);
-
-  if (intersects.length > 0 && constraint) {
-    world.removeConstraint(constraint);
-    constraint = null;
-    constraintRemoved = true;
-  }
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-  world.fixedStep();
-
-  // Sync cube with physics
-  cube.position.copy(cubeBody.position);
-  cube.quaternion.copy(cubeBody.quaternion);
-
-  // Update string line
-  stringLine.geometry.setFromPoints([
-    anchorMesh.position,
-    cube.position
-  ]);
-
-  // controls.update();
-  renderer.render(scene, camera);
-}
-
-function onResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-</script>
-
+    <div id="ui">
+      <form id="treeForm">
+  
+        Shape: <select name="shape"><option>sphere</option><option>box</option></select><br>
+        Colors: <input name="colors" placeholder="#ff00ff or [#ff0,#0f0]" /><br>
+        Origins: <input name="origins" placeholder="[0,0,0] or [[0,0,0],[1,1,1]]" /><br>
+        Node Size: <input name="size" type="number" value="0.5" /><br>
+        Link Length: <input name="linkLength" type="number" value="2" /><br>
+        Depth: <input name="depth" type="number" value="3" /><br>
+        <button type="submit">Add Tree</button>
+  
+      </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script type="module" src="/static/js/test.js"></script>
 </body>
 </html>

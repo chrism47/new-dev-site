@@ -1,0 +1,38 @@
+{% extends "projects/al-g/template/base.html" %}
+
+{% block content %}
+        
+        <p class="minimize-btn">Hide</p>
+
+        <div id="ds-form">
+        
+        <form id="treeForm" style="z-index: 10;">
+        <label>Data (comma-separated):<br>
+        <textarea class="array-input"name="data" rows="4" cols="50">10,5,15,7</textarea>
+        </label><br><br>
+
+        <label>Node Size:<br>
+        <input type="range" name="nodeSize" min="0.1" max="2" step="0.1" value="0.8">
+        <span id="nodeSizeVal">0.8</span>
+        </label><br><br>
+
+        <label>Line Thickness:<br>
+        <input type="range" name="lineThickness" min="0.01" max="1" step="0.01" value="0.1">
+        <span id="lineThicknessVal">0.1</span>
+        </label><br><br>
+
+        <label>Color:<br>
+        <input type="color" name="color" value="#00ff00">
+        </label><br><br>
+
+        <label>Origin X: <input type="number" name="originX" value="0"></label><br>
+        <label>Origin Y: <input type="number" name="originY" value="0"></label><br>
+        <label>Origin Z: <input type="number" name="originZ" value="0"></label><br><br>
+
+        <button type="button" id="createTreeBtn">Create New Tree</button>
+        </form>
+
+   </div>      
+        
+  <script type="module" src="{{ url_for('static', filename='js/al-g/alGMain.js') }}"></script>
+{% endblock %}

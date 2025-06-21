@@ -30,6 +30,9 @@ def link_page():
 @app.route('/al-g')
 def al_g():  
     return render_template('projects/al-g/al-g.html')
+@app.route('/al-g/tool')
+def al_g_tool():  
+    return render_template('projects/al-g/al-g-tool.html')
 
 @app.route('/kicking-stickman')
 def kicking_stickman():  

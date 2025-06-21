@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Binary Tree Visualizer</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<!-- <script type="module" src="./three@0.158.0/examples/jsm/controls/OrbitControls.js"></script> -->
+<script>
+  // === Structure Class ===
+ 
+  // === Tree Module ===
+  
+
+  // === Scene Setup ===
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+
+  const camera = new THREE.PerspectiveCamera(
+    45, window.innerWidth / window.innerHeight, 0.1, 1000
+  );
+  camera.position.set(0, 0, 20);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+//   const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  // Lights
+  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+  const directional = new THREE.DirectionalLight(0xffffff, 0.8);
+  directional.position.set(10, 10, 10);
+  scene.add(ambient);
+  scene.add(directional);
+
+  // Structure + Tree Setup
+  const structure = new Structure(scene);
+  const tree = new Tree();
+  structure.addModule("tree", tree);
+  structure.setActiveModule("tree");
+
+  // Config Example (could come from form input)
+  structure.updateFromConfig({
+    data: [1,5, 15, 2, 7, 12, 1,1,1, 17],
+    nodeSize: 0.5,
+    color: 0x66ccff,
+    lineThickness: 0.007
+  });
+  let nodeDataList = structure.data;
+  console.log(structure,structure.activeModule.modules)
+  console
+  // Animate
+  function animate() {
+    requestAnimationFrame(animate);
+    // controls.update();
+    
+    renderer.render(scene, camera);
+  };
+
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+</script>
+</body>
+</html>

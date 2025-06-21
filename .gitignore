@@ -1,4 +1,6 @@
 /static/threejs-examples
+/static/js/experiment
+/templates/threejs-examples
 /junk
 /.venv
 /.env

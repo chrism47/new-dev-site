@@ -17,7 +17,12 @@ a {
     color: var(--primary-green);
     text-decoration: none;   
 }
+div.page-container {
+        z-index: 10;
+
+}
 .page-container a {
+    
     /* border-style: solid; */
     border-radius: 5px;
     /* border-width: 1px; */
@@ -120,13 +125,14 @@ footer {
     border-width: 1px;
     box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.308);
 }
-.al-g-box, .background-window{
+ .background-window{
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: -1; 
+    pointer-events: auto;
 }
 .note-display {
     height: fit-content;
@@ -221,6 +227,45 @@ img.work-preview-img {
 .page-container.info a {
     margin-left: 10%;
 }
+#treeForm {
+    background-color: #00000052;
+    position: absolute;
+    width: fit-content;
+    padding: 2%;
+    border-radius: 5%;
+    z-index: 1;
+    pointer-events: auto;
+}
+#ds-form {
+    height: fit-content;
+}
+.array-input {
+    width: 200px;
+    height: 50px;
+    border-radius: 4%;
+    color: var(--primary-green);
+    background-color: #0000005d;
+}
+.minimize-btn {
+    position: relative;
+    top: 4.5%;
+    /* left: 5%; */
+    width: fit-content;
+    z-index: 2;
+    padding:4px;
+    margin-top: 30px;
+    box-shadow: 0 0 3px 1px var(--primary-green);
+}
+.page-back-btn {
+    position: relative;
+    background-color: #0000005d;
+    z-index: 2;
+    width: fit-content;
+    border-radius: 5px;
+    padding: 5px;
+    height: 25px;
+}
+
 @media (max-width:700px){
     :root {
         --primary-green: #5f9229; 
