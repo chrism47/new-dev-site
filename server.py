@@ -27,6 +27,15 @@ def link_page():
 
 
 #---------------------------PROJECTS
+@app.route('/a-gent')
+def a_gent_info():  
+    return render_template('projects/ai-agents/agent-info.html')
+
+@app.route('/a-gent/chat')
+def a_gent():  
+    return render_template('projects/ai-agents/agent.html')
+
+
 @app.route('/al-g')
 def al_g():  
     return render_template('projects/al-g/al-g.html')
@@ -55,6 +64,15 @@ def space_invaders():
 def shape_quest():  
     return render_template('vibe-codes/shape-quest.html')
 
+@app.route('/fractal-glass')
+def fractal_glass():  
+    return render_template('vibe-codes/fractal-glass.html')
+
+
+#----------------------------BUSINESS---------
+@app.route('/web-dev')
+def web_dev():  
+    return render_template('mockups/web-index.html')
 
 
 

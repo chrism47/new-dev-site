@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CMDev_ Website{% endblock %}</title> 
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/",
+            "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"
+
+          }
+        }
+    </script>
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.6/dist/katex.min.css">
+
+    <script src="
+https://cdn.jsdelivr.net/npm/marked@15.0.12/lib/marked.umd.min.js
+"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap" rel="stylesheet"><!-- Your custom CSS -->
+    
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+
+    
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        
+            <a href="/"> <h1>CMDev_</h1></a> 
+            <div class="page-nav-menu"> 
+                <a href="/work">Work</a>
+                <a href="/info">Info</a>
+            </div>
+            
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <!-- KaTeX JS -->
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.6/dist/katex.min.js"></script>
+        
+    </footer>
+</body>
+</html>

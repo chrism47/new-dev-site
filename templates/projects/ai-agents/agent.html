@@ -1,0 +1,19 @@
+{% extends "core/templates/agent-base.html" %}
+{% block content %}
+  <div class="page-container">
+
+  <h1>Chat with a-Gent, my AI agent assistant</h1>
+
+  <pre id="response"></pre>
+  <!-- Example response: -->
+  <!-- <pre id="response">{<br>  "reply": "Hey there! I'm Chris's AI assistant and friend - great to have you here! How can I help you today? I'm happy to chat about anything from web development to philosophy, or point you to some interesting parts of Chris's work if you'd like."<br>}</pre> -->
+    </div>
+    <div class="a-gent-input">
+  <div id="a-gent-input">
+    <textarea id="msg"  rows="1"></textarea>
+    <div class="a-gent-send">-></div>
+  </div>
+</div>
+
+  <script type="module" src="{{ url_for('static', filename='js/ai-agents/aGentAPI.js') }}"></script>
+{% endblock %}

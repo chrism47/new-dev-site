@@ -1,0 +1,35 @@
+<!-- 3. MuralMind - Street Art Discovery -->
+<!-- Home Feed -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MuralMind</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #fff; color: #111827; }
+    header { padding: 1rem; background: #1d4ed8; color: white; text-align: center; }
+    h1 { margin: 0; font-size: 2rem; }
+    .feed { display: flex; flex-wrap: wrap; gap: 1rem; padding: 2rem; justify-content: center; }
+    .card { width: 200px; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1); background: white; }
+    .card img { width: 100%; height: 150px; object-fit: cover; }
+    .card p { padding: 0.5rem; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MuralMind</h1>
+    <p>Explore the world of public art around you.</p>
+  </header>
+  <section class="feed">
+    <div class="card">
+      <img src="https://source.unsplash.com/200x150/?mural" alt="Mural">
+      <p>“Urban Bloom” – Downtown LA</p>
+    </div>
+    <div class="card">
+      <img src="https://source.unsplash.com/200x150/?street-art" alt="Mural">
+      <p>“The Watcher” – Brooklyn</p>
+    </div>
+  </section>
+</body>
+</html>
