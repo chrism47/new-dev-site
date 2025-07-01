@@ -56,3 +56,8 @@ msgInput.addEventListener("input", () => {
   msgInput.style.height = "auto"; // reset height
   msgInput.style.height = msgInput.scrollHeight + "px"; // set to scroll height
 });
+msgInput.addEventListener("focus", () => {
+  setTimeout(() => {
+    msgInput.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 300);
+});
