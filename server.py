@@ -31,9 +31,9 @@ def link_page():
 def a_gent_info():  
     return render_template('projects/ai-agents/agent-info.html')
 
-@app.route('/a-gent/chat')
-def a_gent():  
-    return render_template('projects/ai-agents/agent.html')
+# @app.route('/a-gent/chat')
+# def a_gent():  
+#     return render_template('projects/ai-agents/agent.html')
 
 
 @app.route('/al-g')
