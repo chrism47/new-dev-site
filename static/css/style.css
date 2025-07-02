@@ -339,7 +339,17 @@ textarea#msg {
 .a-gent-send:hover {
     background: #388E3C;
 }
-/* Responsive Adjustments */
+
+.error-msg {
+  background-color: #ffe5e5;
+  color: #b30000;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-weight: 500;
+}
+ 
+
 @media (max-width: 700px) {
     :root {
         --primary-green: #4CAF50;

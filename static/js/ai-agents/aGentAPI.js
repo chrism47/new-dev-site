@@ -9,17 +9,26 @@ async function sendMessage() {
   convHistory.push({ sender: "user", text: msg });
   renderMessage("user", msg);
 
-  const res = await fetch("https://cmdev-agent-api-89c79a0dd53f.herokuapp.com/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: msg }),
-  });
+  try {
+    const res = await fetch("https://cmdev-agent-api-89c79a0dd53f.herokuapp.com/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg }),
+    });
 
-  const data = await res.json();
-  const reply = data.reply;
+    if (!res.ok) {
+      throw new Error(`HTTP error: ${res.status}`);
+    }
 
-  convHistory.push({ sender: "bot", text: reply });
-  renderMessage("bot", reply);
+    const data = await res.json();
+    const reply = data.reply;
+
+    convHistory.push({ sender: "bot", text: reply });
+    renderMessage("bot", reply);
+  } catch (error) {
+    console.error("API call failed:", error);
+    renderError("Looks like either there's an issue, or a-Gent is burnt out for the day...");
+  }
 
   console.log(convHistory);
 }
@@ -37,24 +46,27 @@ function renderMessage(sender, text) {
   responseEl.scrollTop = responseEl.scrollHeight;
 }
 
+function renderError(text) {
+  const responseEl = document.getElementById("response");
+  const errorDiv = document.createElement("div");
+  errorDiv.className = "error-msg";
+
+  const paragraph = document.createElement("p");
+  paragraph.innerText = text;
+
+  errorDiv.appendChild(paragraph);
+  responseEl.appendChild(errorDiv);
+  responseEl.scrollTop = responseEl.scrollHeight;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelector(".a-gent-send").addEventListener("click", sendMessage);
-
-//   // 📝 Optional placeholder messages — feel free to comment these out
-//   const defaultConv = [
-//     { sender: "user", text: "Hello" },
-//     { sender: "bot", text: "Hi there! How can I help you today?" },
-//     { sender: "user", text: "What can you do?" },
-//     { sender: "bot", text: "I can assist with tasks like summarizing, writing, coding, and more." },
-//   ];
-//   defaultConv.forEach(msg => renderMessage(msg.sender, msg.text));
 });
 
 const msgInput = document.getElementById("msg");
-
 msgInput.addEventListener("input", () => {
-  msgInput.style.height = "auto"; // reset height
-  msgInput.style.height = msgInput.scrollHeight + "px"; // set to scroll height
+  msgInput.style.height = "auto";
+  msgInput.style.height = msgInput.scrollHeight + "px";
 });
 msgInput.addEventListener("focus", () => {
   setTimeout(() => {
